@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:lyrics_app/bloc/music_model.dart';
+import 'package:lyrics_app/music_bloc/music_model.dart';
 import 'package:lyrics_app/globals.dart';
 
 import 'dart:convert';
@@ -24,4 +24,12 @@ Future<List<MusicModel>> getTracks() async {
     musicList.add(musicModel);
   }
   return musicList;
+}
+
+Future<String> getLyrics(String id) async {
+  http.Response response =
+      await http.get(Uri.parse('$BASE_URL$TRACK_LYRICS$id&apikey=$APIKEY'));
+
+  Map data = json.decode(response.body)['message']['body'];
+  return data['lyrics']['lyrics_body'];
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lyrics_app/bloc/music_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lyrics_app/music_bloc/api_helper.dart';
+import 'package:lyrics_app/music_bloc/music_bloc.dart';
+import 'package:lyrics_app/music_bloc/music_model.dart';
 
 class DetailPage extends StatefulWidget {
   final MusicModel musicModel;
@@ -11,10 +14,17 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Track Details"),
+        elevation: 0,
+        centerTitle: true,
+        title: const Text("Track Details"),
       ),
       body: ListView(
         children: [
@@ -24,8 +34,24 @@ class _DetailPageState extends State<DetailPage> {
           _getElement(
               "Explicit", widget.musicModel.explicit == 1 ? "True" : "False"),
           _getElement("Rating", widget.musicModel.trackRating.toString()),
-
-          
+          FutureBuilder(
+            future: getLyrics(widget.musicModel.trackId.toString()),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError) {
+                  return const Text("Lyrics not available");
+                }
+                return _getElement("Lyrics", snapshot.data.toString());
+              } else if (snapshot.connectionState == ConnectionState.waiting ||
+                  snapshot.connectionState == ConnectionState.active) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else {
+                return Text("An error occured");
+              }
+            },
+          )
         ],
       ),
     );
@@ -45,6 +71,7 @@ class _DetailPageState extends State<DetailPage> {
               fontSize: 16,
             ),
           ),
+          SizedBox(height: 5),
           Text(data ?? ""),
         ],
       ),

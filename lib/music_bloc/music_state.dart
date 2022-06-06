@@ -17,3 +17,4 @@ class MusicListLoaded extends MusicState {
   @override
   List<Object> get props => music;
 }
+

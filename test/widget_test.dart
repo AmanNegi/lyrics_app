@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:lyrics_app/bloc/music_model.dart';
+import 'package:lyrics_app/music_bloc/music_model.dart';
 import 'package:lyrics_app/globals.dart';
 import 'dart:io';
 import 'dart:convert';
