@@ -11,7 +11,7 @@ A Flutter project that show lyrics of a music track. This project is a submissio
    ├── helper/   # This folder contains helper methods and classes.
    ├── music_bloc/   # This folder contains bloc logic to fetch and display music.
    ├── network_bloc/   # This folder contains bloc logic to check internet.
-   ├── local_data.dart   # Contains the files for local persistence. 
+   ├── local_data.dart   # Contains the logic for local persistence. 
    └── main.dart   # Root file of the project
 ```
 
