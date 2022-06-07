@@ -1,7 +1,11 @@
-library data_connection_checker;
-
 import 'dart:io';
 import 'dart:async';
+
+/*
+* This File is Sourced From data_connection_helper package.
+* The package currently doesn't support Null Safety so copied 
+* the file and updated the source code to support Sound Null Safety.
+ */
 
 enum DataConnectionStatus {
   disconnected,
@@ -11,9 +15,9 @@ enum DataConnectionStatus {
 class DataConnectionChecker {
   static const int DEFAULT_PORT = 53;
 
-  static const Duration DEFAULT_TIMEOUT = const Duration(seconds: 5);
+  static const Duration DEFAULT_TIMEOUT = Duration(seconds: 5);
 
-  static const Duration DEFAULT_INTERVAL = const Duration(seconds: 5);
+  static const Duration DEFAULT_INTERVAL = Duration(seconds: 5);
 
   static final List<AddressCheckOptions> DEFAULT_ADDRESSES = List.unmodifiable([
     AddressCheckOptions(
@@ -107,7 +111,7 @@ class DataConnectionChecker {
   DataConnectionStatus? _lastStatus;
   Timer? _timerHandle;
 
-  StreamController<DataConnectionStatus> _statusController =
+  final StreamController<DataConnectionStatus> _statusController =
       StreamController.broadcast();
 
   Stream<DataConnectionStatus> get onStatusChange => _statusController.stream;

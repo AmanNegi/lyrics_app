@@ -1,12 +1,14 @@
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
+
 MusicModel musicModelFromMap(String str) =>
     MusicModel.fromMap(json.decode(str));
 
 String musicModelToMap(MusicModel data) => json.encode(data.toMap());
 
-class MusicModel {
-  MusicModel({
+class MusicModel extends Equatable {
+  const MusicModel({
     this.trackId,
     this.trackName,
     this.trackRating,
@@ -24,21 +26,21 @@ class MusicModel {
     this.restricted,
   });
 
-  int? trackId;
-  String? trackName;
-  int? trackRating;
-  int? commontrackId;
-  int? instrumental;
-  int explicit;
-  int? hasLyrics;
-  int? hasSubtitles;
-  int? hasRichsync;
-  int? numFavourite;
-  int? albumId;
-  String? albumName;
-  int? artistId;
-  String? artistName;
-  int? restricted;
+ final int? trackId;
+ final String? trackName;
+ final int? trackRating;
+ final int? commontrackId;
+ final int? instrumental;
+ final int explicit;
+ final int? hasLyrics;
+ final int? hasSubtitles;
+ final int? hasRichsync;
+ final int? numFavourite;
+ final int? albumId;
+ final String? albumName;
+ final int? artistId;
+ final String? artistName;
+ final int? restricted;
 
   factory MusicModel.fromMap(Map<String, dynamic> json) => MusicModel(
         trackId: json["track_id"],
@@ -75,4 +77,7 @@ class MusicModel {
         "artist_name": artistName,
         "restricted": restricted,
       };
+
+  @override
+  List<Object?> get props => [trackId, trackName, albumId, albumName];
 }

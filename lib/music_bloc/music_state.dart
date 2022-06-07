@@ -1,8 +1,6 @@
 part of 'music_bloc.dart';
 
 abstract class MusicState extends Equatable {
-  const MusicState();
-
   @override
   List<Object> get props => [];
 }
@@ -10,11 +8,12 @@ abstract class MusicState extends Equatable {
 class MusicListLoading extends MusicState {}
 
 class MusicListLoaded extends MusicState {
-  final List<MusicModel> music;
-
-  const MusicListLoaded({this.music = const []});
+  final List<MusicModel> newMusic;
+  final int length;
+  MusicListLoaded({this.newMusic = const [], this.length = 0});
 
   @override
-  List<Object> get props => music;
+  List<Object> get props => [newMusic, length];
 }
 
+class MusicListLoadComplete extends MusicState {}

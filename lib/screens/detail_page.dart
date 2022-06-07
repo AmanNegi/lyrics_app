@@ -1,20 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lyrics_app/music_bloc/api_helper.dart';
-import 'package:lyrics_app/music_bloc/music_bloc.dart';
 import 'package:lyrics_app/music_bloc/music_model.dart';
+import 'package:lyrics_app/widgets/bookmark_widget.dart';
 
 class DetailPage extends StatefulWidget {
-  final MusicModel musicModel;
-  const DetailPage({Key? key, required this.musicModel}) : super(key: key);
+  //* Receive Data from constructor to check navigated from which page
+  final MusicModel? musicModel;
+  final bool localRequest;
+  final String trackId;
+
+  const DetailPage({
+    Key? key,
+    this.musicModel,
+    this.localRequest = false,
+    this.trackId = "",
+  }) : super(key: key);
 
   @override
   State<DetailPage> createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
+  late MusicModel musicModel;
+  bool isLoading = false;
   @override
   void initState() {
+    //* If local request, request data from API and load
+    if (widget.localRequest) {
+      isLoading = true;
+      getMusicDetailsFromId(widget.trackId).then((value) {
+        musicModel = value;
+        isLoading = false;
+        if (mounted) setState(() {});
+      });
+    }
+    // * If From HomePage, simply get the musicModel from parent
+    else {
+      musicModel = widget.musicModel!;
+    }
     super.initState();
   }
 
@@ -25,35 +48,60 @@ class _DetailPageState extends State<DetailPage> {
         elevation: 0,
         centerTitle: true,
         title: const Text("Track Details"),
-      ),
-      body: ListView(
-        children: [
-          _getElement("Name", widget.musicModel.trackName),
-          _getElement("Artist", widget.musicModel.artistName),
-          _getElement("Album Name", widget.musicModel.albumName),
-          _getElement(
-              "Explicit", widget.musicModel.explicit == 1 ? "True" : "False"),
-          _getElement("Rating", widget.musicModel.trackRating.toString()),
-          FutureBuilder(
-            future: getLyrics(widget.musicModel.trackId.toString()),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasError) {
-                  return const Text("Lyrics not available");
-                }
-                return _getElement("Lyrics", snapshot.data.toString());
-              } else if (snapshot.connectionState == ConnectionState.waiting ||
-                  snapshot.connectionState == ConnectionState.active) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else {
-                return Text("An error occured");
-              }
-            },
-          )
+        actions: [
+          isLoading
+              ? Container()
+              : BookmarkWidget(
+                  musicModel: musicModel,
+                  trackId: widget.trackId,
+                ),
         ],
       ),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView(
+              children: [
+                _getTrackDetail(musicModel),
+                _getLyricsWidget(widget.trackId),
+              ],
+            ),
+    );
+  }
+
+  Widget _getTrackDetail(MusicModel musicModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _getElement("Name", musicModel.trackName),
+        _getElement("Artist", musicModel.artistName),
+        _getElement("Album Name", musicModel.albumName),
+        _getElement("Explicit", musicModel.explicit == 1 ? "True" : "False"),
+        _getElement("Rating", musicModel.trackRating.toString()),
+      ],
+    );
+  }
+
+  Widget _getLyricsWidget(String trackId) {
+    //* Using FutureBuilder to get lyrics from the server
+    return FutureBuilder(
+      future: getLyrics(trackId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return const Text("Lyrics not available");
+          }
+          return _getElement("Lyrics", snapshot.data.toString());
+        } else if (snapshot.connectionState == ConnectionState.waiting ||
+            snapshot.connectionState == ConnectionState.active) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return const Text("An error occured");
+        }
+      },
     );
   }
 
@@ -63,7 +111,7 @@ class _DetailPageState extends State<DetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Text(
             title,
             style: const TextStyle(
@@ -71,7 +119,7 @@ class _DetailPageState extends State<DetailPage> {
               fontSize: 16,
             ),
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Text(data ?? ""),
         ],
       ),

@@ -25,10 +25,12 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: BlocBuilder<NetworkBloc, NetworkState>(
           builder: (context, state) {
-            if (state is NetworkSuccess)
-              return HomePage();
-            else
-              return ErrorPage();
+            //* Navigate according to internet availability
+            if (state is NetworkSuccess) {
+              return const HomePage();
+            } else {
+              return const ErrorPage();
+            }
           },
         ),
       ),

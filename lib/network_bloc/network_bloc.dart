@@ -9,13 +9,15 @@ part 'network_state.dart';
 
 class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
   late StreamSubscription subscription;
+
   NetworkBloc() : super(NetworkInitial()) {
     on<ConnectionChanged>((event, emit) {
+      //* Simply emit the event connection
       emit(event.connection);
     });
 
     on<ListenConnection>((event, emit) {
-      print("Listening to events now ");
+      //* Add Network Connection Listener
       subscription = DataConnectionChecker().onStatusChange.listen((status) {
         add(ConnectionChanged(status == DataConnectionStatus.disconnected
             ? NetworkFailure()
@@ -26,6 +28,7 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
 
   @override
   Future<void> close() {
+    //* Dispose off the StreamSubscription
     subscription.cancel();
     return super.close();
   }
